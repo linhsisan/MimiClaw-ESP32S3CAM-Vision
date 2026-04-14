@@ -1,0 +1,11 @@
+menu "Display Configuration"
+    choice DISPLAY_MODEL
+        prompt "Select TFT Display Model"
+        default USE_ILI9341
+
+        config USE_ILI9341
+            bool "ILI9341 (Default)"
+        config USE_ST7789
+            bool "ST7789 (Specific settings)"
+    endchoice
+endmenu

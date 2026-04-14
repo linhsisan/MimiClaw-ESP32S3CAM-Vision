@@ -1,0 +1,11 @@
+dependencies:
+  idf: '>=5.3.5'
+  # 鎖定 LVGL 為 v8 系列以相容你的程式碼
+  lvgl/lvgl: ^8.3.0
+  # 放寬 lvgl_port 版本，讓系統自己挑最新相容的
+  espressif/esp_lvgl_port: ^2.0.0
+  # 通訊必備
+  espressif/cjson: '*'
+  espressif/esp_websocket_client: '*'
+  espressif/led_strip: '*'
+  espressif/esp32-camera: '*'

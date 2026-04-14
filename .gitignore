@@ -1,0 +1,61 @@
+# Build output
+build/
+dist/
+tmp/
+releases/
+
+# ESP-IDF
+sdkconfig
+sdkconfig.old
+dependencies.lock
+components/
+managed_components/
+
+# Generated headers
+main/assets/lang_config.h
+main/mmap_generate_emoji.h
+mmap_generate_*.h
+mimi_secrets.h
+
+# IDE / Editor
+.vscode/
+.devcontainer/
+.idea/
+.clangd
+*.swp
+*.swo
+*~
+
+# Environment
+.env
+main/mimi_secrets.h
+
+# Cache / Compiled
+.cache
+*.pyc
+*.bin
+
+# Documentation (generated)
+BUILD_TEST_GUIDE.md
+COMPILE_TEST_REPORT.md
+CURRENT_STATUS.md
+FEISHU_INTEGRATION_SUMMARY.md
+QUICK_START.md
+QWEN_INTEGRATION_PLAN.md
+QWEN_INTEGRATION_COMPLETE.md
+build_test.sh
+build_and_integrate_qwen.sh
+verify_integration.sh
+
+# Reference repos
+nanobot/
+
+# MCP / Memov
+.mcp.json
+.mem/
+.memignore
+# OS
+.DS_Store
+Thumbs.db
+references/
+.venv/
