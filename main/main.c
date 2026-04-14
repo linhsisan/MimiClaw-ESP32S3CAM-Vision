@@ -100,6 +100,11 @@ void outbound_dispatch_task(void *arg) {
 /* ══════════════ 主程式入口 ══════════════ */
 
 void app_main(void) {
+
+    // 暫時加入這行來強制刪除壞掉的排程檔 (如果你看到這行被觸發的話，表示之前的 cron.json 已經損毀了，刪掉它就對了！)
+//remove("/spiffs/cron.json"); 
+//ESP_LOGW("SYS", "緊急救援：已刪除損毀的排程檔案！");
+
     // 1. 初始化 NVS
     esp_err_t ret = nvs_flash_init();
     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
