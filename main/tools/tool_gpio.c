@@ -1,9 +1,7 @@
 #include "mimi_config.h"
 
-
 #include "tools/tool_gpio.h"
 #include "tools/gpio_policy.h"
-
 
 #include "driver/gpio.h"
 #include "esp_log.h"
@@ -45,6 +43,23 @@ esp_err_t tool_gpio_write_execute(const char *input_json, char *output, size_t o
 
     int pin = (int)pin_obj->valuedouble;
     int state = (int)state_obj->valuedouble;
+
+    /* ====================================================================
+     * 🌟 終極防呆陷阱 (無依賴版)：直接退回並痛罵 AI
+     * ==================================================================== */
+    if (pin == 48) {
+        ESP_LOGW(TAG, "⚠️ 攔截到 AI 嘗試用 gpio_write 操作 Pin 48 (WS2812)！指令已擋下。");
+        
+        // 故意回傳一段嚴厲的英文警告給 AI 大腦，它讀到後就會意識到錯誤
+        snprintf(output, output_size, 
+                 "FATAL ERROR: Pin 48 is a WS2812 Smart LED. You are STRICTLY FORBIDDEN from using gpio_write on it. "
+                 "The hardware ignored your command. To turn off this LED, you MUST use the tool 'set_led_color' with parameters r:0, g:0, b:0 IMMEDIATELY.");
+        
+        cJSON_Delete(root);
+        // 回傳 ESP_OK 讓 AI 能順利讀取這段「痛罵」的文字
+        return ESP_OK; 
+    }
+    /* ==================================================================== */
 
     if (!gpio_policy_pin_is_allowed(pin)) {
         if (gpio_policy_pin_forbidden_hint(pin, output, output_size)) {

@@ -83,11 +83,28 @@
 #define MIMI_TIMEZONE                "PST8PDT,M3.2.0,M11.1.0"
 
 /* LLM */
+
+/*
+// 🌟 換成 MiniMax 最新的強大模型
+#define MIMI_LLM_DEFAULT_MODEL       "MiniMax-M2.7"
+// ⚠️ 絕對不要動這個！保持 "openai" 才能讓底層繼續用正確的 JSON 格式打包
+#define MIMI_LLM_PROVIDER_DEFAULT    "openai"
+#define MIMI_LLM_MAX_TOKENS          4096
+// 🌟 把所有原本指向 OpenAI 的網址，全部綁架到 MiniMax 的伺服器！
+#define MIMI_LLM_API_URL             "https://api.minimaxi.com/v1/chat/completions"
+#define MIMI_OPENAI_API_URL          "https://api.minimaxi.com/v1/chat/completions"
+*/
+
+
+
 #define MIMI_LLM_DEFAULT_MODEL       "gpt-4o-mini"
 #define MIMI_LLM_PROVIDER_DEFAULT    "openai"
 #define MIMI_LLM_MAX_TOKENS          4096
 #define MIMI_LLM_API_URL             "https://api.openai.com/v1/chat/completions"
 #define MIMI_OPENAI_API_URL          "https://api.openai.com/v1/chat/completions"
+
+
+
 #define MIMI_LLM_API_VERSION         "2023-06-01"
 #define MIMI_LLM_STREAM_BUF_SIZE     (32 * 1024)
 #define MIMI_LLM_LOG_VERBOSE_PAYLOAD 0
@@ -113,7 +130,7 @@
 /* Cron / Heartbeat */
 #define MIMI_CRON_FILE               MIMI_SPIFFS_BASE "/cron.json"
 #define MIMI_CRON_MAX_JOBS           64
-#define MIMI_CRON_CHECK_INTERVAL_MS  (1 * 1000)  //每次檢查的間隔，建議 1-5 秒
+#define MIMI_CRON_CHECK_INTERVAL_MS  (1 * 5000)  //每次檢查的間隔，建議 1-5 秒
 #define MIMI_HEARTBEAT_FILE          MIMI_SPIFFS_BASE "/HEARTBEAT.md"
 #define MIMI_HEARTBEAT_INTERVAL_MS   (30 * 60 * 1000)
 

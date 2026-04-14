@@ -24,6 +24,8 @@
 // ✨ 新增：相機服務模組
 #include "camera_service.h"
 
+#include "esp_netif.h"
+
 static const char *TAG = "mimi_main";
 
 extern esp_err_t agent_loop_feed(mimi_msg_t *msg);
@@ -50,6 +52,29 @@ void inbound_dispatch_task(void *arg) {
         mimi_msg_t msg = {0};
         if (message_bus_pop_inbound(&msg, portMAX_DELAY) == ESP_OK) {
             display_service_push_chat("user", msg.content);
+            
+            /* =========================================================
+             * 🧠 終極修改：隱藏警告注射器 (Context Injection)
+             * 在把訊息餵給大腦前，強行加上不可見的系統級鐵律
+             * ========================================================= */
+            if (msg.content != NULL) {
+                // 建立一個夠大的新字串緩衝區 (+512 bytes 給警告文字)
+                size_t new_len = strlen(msg.content) + 512;
+                char *injected_content = malloc(new_len);
+                
+                if (injected_content) {
+                    // 將「主人的原話」與「恐嚇警告」完美融合
+                    snprintf(injected_content, new_len, 
+                        "%s\n\n[SYSTEM WARNING: If the master requested a physical action (motor, fan, led, photo), you MUST output a tool call IMMEDIATELY as your first response. DO NOT output conversational text first. Bypassing tools will cause a fatal system crash.]", 
+                        msg.content);
+                    
+                    // 釋放原本沒有警告的舊字串，換成加料版
+                    free(msg.content);
+                    msg.content = injected_content;
+                }
+            }
+            /* ========================================================= */
+
             agent_loop_feed(&msg); 
             if (msg.content) free(msg.content);
         }
@@ -109,7 +134,7 @@ void app_main(void) {
         display_service_show_wifi_ok("Connected");
 
 
-// 6. 系統服務初始化
+        // 6. 系統服務初始化
         mimi_time_service_init();
         
         /* ---------------------------------------------------------
@@ -117,7 +142,6 @@ void app_main(void) {
          * --------------------------------------------------------- */
         cron_service_init();   // 去 SPIFFS 讀取以前存檔的排程
         cron_service_start();  // 啟動背景任務，時間到了自動觸發
-
 
         message_bus_init();
 
@@ -175,6 +199,7 @@ void app_main(void) {
                         printf(" 1. 【記憶系統】永遠使用 append_file 記錄 MEMORY.md，絕不覆蓋。\n");
                         printf(" 2. 【視覺系統】主動使用 take_photo 拍攝最新環境照片。\n");
                         printf(" 3. 【時間管理】超過 5 秒的任務必須使用 cron_add，嚴禁死等。\n");
+                        printf(" 4. 【網頁管理】192.168.XX.XX:18789\n");
                         printf("========================================================\n");
                         printf("\033[0m\n");
                     } else {
