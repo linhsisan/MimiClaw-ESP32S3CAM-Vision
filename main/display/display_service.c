@@ -6,6 +6,7 @@
 #include "lvgl.h"
 #include "source-han-sans16.h"
 
+#include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,14 +36,13 @@
 #endif
 
 static SemaphoreHandle_t     s_mutex;
-static char                  s_ip[16];
 
-#define BANNER_HEIGHT   24   
-#define STATUS_HEIGHT   84   
-#define DIVIDER_HEIGHT  12                            
-#define CHAT_Y          (STATUS_HEIGHT + DIVIDER_HEIGHT)  
-#define CHAT_HEIGHT     (DISP_HEIGHT - CHAT_Y)
-#define MAX_BUBBLES     12                            
+// 🎨 UI 佈局參數調整：徹底移除 Banner，頂部只留兩行
+#define STATUS_HEIGHT   48   // 頂部高度縮小至 48px (剛好放兩行字)
+#define DIVIDER_HEIGHT  8    // 分隔線高度
+#define CHAT_Y          (STATUS_HEIGHT + DIVIDER_HEIGHT)  // 對話框起始點 Y=56
+#define CHAT_HEIGHT     (DISP_HEIGHT - CHAT_Y) // 對話框獲得更多空間！
+#define MAX_BUBBLES     16   // 空間變大，對話氣泡上限增加到 16
 #define BUBBLE_MAX_W    (DISP_WIDTH * 92 / 100)    
 #define BUBBLE_PAD      6                             
 #define BUBBLE_MARGIN   4                             
@@ -83,7 +83,7 @@ static bool lvgl_lock(uint32_t timeout_ms) {
 }
 static void lvgl_unlock(void) { xSemaphoreGive(s_lvgl_mutex); }
 
-static lv_obj_t *s_lbl_a, *s_lbl_b, *s_lbl_c, *s_lbl_ip;
+static lv_obj_t *s_lbl_status, *s_lbl_model; 
 static lv_obj_t *s_chat_cont;
 static const lv_font_t *s_font_cn;
 static const lv_font_t *s_font_en;
@@ -98,52 +98,32 @@ static void create_ui(void) {
     s_cjk_font.fallback = s_font_en;
     s_font_cn = &s_cjk_font;
 
-    lv_obj_t *banner_bg = lv_obj_create(scr);
-    lv_obj_set_size(banner_bg, DISP_WIDTH, BANNER_HEIGHT);
-    lv_obj_set_pos(banner_bg, 0, 0);
-    lv_obj_set_style_bg_color(banner_bg, lv_color_make(0x0D, 0x1B, 0x2E), 0);
-    lv_obj_set_style_border_width(banner_bg, 0, 0);
-    lv_obj_clear_flag(banner_bg, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_t *banner_lbl = lv_label_create(banner_bg);
-    lv_obj_set_style_text_color(banner_lbl, lv_color_make(0xFF, 0xFF, 0xFF), 0);
-    lv_obj_set_style_text_font(banner_lbl, s_font_cn, 0);
-    lv_label_set_text(banner_lbl, "MimiClaw");
-    lv_obj_align(banner_lbl, LV_ALIGN_CENTER, 0, 0);
-
+    // --- 狀態資訊區塊 (從 Y=0 開始) ---
     lv_obj_t *status_bg = lv_obj_create(scr);
-    lv_obj_set_size(status_bg, DISP_WIDTH, STATUS_HEIGHT - BANNER_HEIGHT);
-    lv_obj_set_pos(status_bg, 0, BANNER_HEIGHT);
+    lv_obj_set_size(status_bg, DISP_WIDTH, STATUS_HEIGHT);
+    lv_obj_set_pos(status_bg, 0, 0); // 直接貼齊螢幕最頂端
     lv_obj_set_style_bg_color(status_bg, lv_color_make(0x1A, 0x1A, 0x2E), 0);
     lv_obj_set_style_border_width(status_bg, 0, 0);
     lv_obj_clear_flag(status_bg, LV_OBJ_FLAG_SCROLLABLE);
 
-    s_lbl_a = lv_label_create(scr);
-    lv_obj_set_style_text_color(s_lbl_a, lv_color_make(0xE8, 0xE8, 0xE8), 0);
-    lv_obj_set_style_text_font(s_lbl_a, s_font_en, 0);
-    lv_label_set_long_mode(s_lbl_a, LV_LABEL_LONG_DOT);
-    lv_obj_set_width(s_lbl_a, DISP_WIDTH - 10);
-    lv_obj_set_pos(s_lbl_a, 5, BANNER_HEIGHT + 4);
-    lv_label_set_text(s_lbl_a, "");
+    // Line 1: 連線狀態 (Y=4)
+    s_lbl_status = lv_label_create(scr);
+    lv_obj_set_style_text_font(s_lbl_status, s_font_cn, 0);
+    lv_label_set_long_mode(s_lbl_status, LV_LABEL_LONG_DOT);
+    lv_obj_set_width(s_lbl_status, DISP_WIDTH - 10);
+    lv_obj_set_pos(s_lbl_status, 5, 4); 
+    lv_label_set_text(s_lbl_status, "系統啟動中...");
 
-    s_lbl_b = lv_label_create(scr);
-    lv_obj_set_style_text_color(s_lbl_b, lv_color_make(0xE8, 0xE8, 0xE8), 0);
-    lv_obj_set_style_text_font(s_lbl_b, s_font_en, 0);
-    lv_label_set_long_mode(s_lbl_b, LV_LABEL_LONG_DOT);
-    lv_obj_set_width(s_lbl_b, DISP_WIDTH - 10);
-    lv_obj_set_pos(s_lbl_b, 5, BANNER_HEIGHT + 22);
-    lv_label_set_text(s_lbl_b, "");
+    // Line 2: 模型名稱 (Y=24)
+    s_lbl_model = lv_label_create(scr);
+    lv_obj_set_style_text_color(s_lbl_model, lv_color_make(0x00, 0xFF, 0xFF), 0); // 青色 (Cyan)
+    lv_obj_set_style_text_font(s_lbl_model, s_font_cn, 0);
+    lv_label_set_long_mode(s_lbl_model, LV_LABEL_LONG_DOT);
+    lv_obj_set_width(s_lbl_model, DISP_WIDTH - 10);
+    lv_obj_set_pos(s_lbl_model, 5, 24);
+    lv_label_set_text(s_lbl_model, "");
 
-    s_lbl_ip = lv_label_create(scr);
-    lv_obj_set_style_text_color(s_lbl_ip, lv_color_make(0x7F, 0x8C, 0x9A), 0);
-    lv_obj_set_style_text_font(s_lbl_ip, s_font_en, 0);
-    lv_label_set_long_mode(s_lbl_ip, LV_LABEL_LONG_DOT);
-    lv_obj_set_width(s_lbl_ip, DISP_WIDTH - 10);
-    lv_obj_set_pos(s_lbl_ip, 5, BANNER_HEIGHT + 40);
-    lv_label_set_text(s_lbl_ip, "");
-
-    s_lbl_c = lv_label_create(scr);
-    lv_obj_add_flag(s_lbl_c, LV_OBJ_FLAG_HIDDEN);
-
+    // --- 對話框區塊 ---
     s_chat_cont = lv_obj_create(scr);
     lv_obj_set_size(s_chat_cont, DISP_WIDTH, CHAT_HEIGHT);
     lv_obj_set_pos(s_chat_cont, 0, CHAT_Y);
@@ -152,12 +132,6 @@ static void create_ui(void) {
     lv_obj_set_style_pad_all(s_chat_cont, BUBBLE_MARGIN, 0);
     lv_obj_set_flex_flow(s_chat_cont, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_scrollbar_mode(s_chat_cont, LV_SCROLLBAR_MODE_OFF);
-}
-
-static void lvgl_clear_status(void) {
-    lv_label_set_text(s_lbl_a, "");
-    lv_label_set_text(s_lbl_b, "");
-    lv_label_set_text(s_lbl_c, "");
 }
 
 esp_err_t display_service_init(void) {
@@ -178,7 +152,6 @@ esp_err_t display_service_init(void) {
 
     if (lvgl_lock(0)) {
         create_ui();
-        lv_label_set_text(s_lbl_a, "Booting...");
         lvgl_unlock();
     }
 
@@ -190,49 +163,85 @@ esp_err_t display_service_init(void) {
 void display_service_show_wifi_connecting(const char *ssid) {
     xSemaphoreTake(s_mutex, portMAX_DELAY);
     if (lvgl_lock(0)) {
-        lvgl_clear_status();
-        lv_label_set_text(s_lbl_a, "WiFi connecting...");
-        lv_label_set_text(s_lbl_b, ssid ? ssid : "?");
+        lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0xE8, 0xE8, 0xE8), 0); // 白色
+        lv_label_set_text(s_lbl_status, "MiniClaw 連線中...");
+        lv_label_set_text_fmt(s_lbl_model, "AP: %s", ssid ? ssid : "?");
         lvgl_unlock();
     }
     xSemaphoreGive(s_mutex);
 }
 
 void display_service_show_wifi_ok(const char *ip) {
-    if (ip) strncpy(s_ip, ip, sizeof(s_ip) - 1);
     xSemaphoreTake(s_mutex, portMAX_DELAY);
     if (lvgl_lock(0)) {
-        lvgl_clear_status();
-        lv_label_set_text(s_lbl_a, "WiFi connected!");
-        lv_label_set_text(s_lbl_ip, s_ip);
+        // 連線成功：綠色
+        lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0x55, 0xFF, 0x55), 0); 
+        lv_label_set_text(s_lbl_status, "MiniClaw Online");
+        lv_label_set_text(s_lbl_model, "正在載入模型...");
         lvgl_unlock();
     }
     xSemaphoreGive(s_mutex);
 }
 
+// 💥 [錯誤狀態 1] WiFi 斷線
 void display_service_show_wifi_fail(void) {
     xSemaphoreTake(s_mutex, portMAX_DELAY);
     if (lvgl_lock(0)) {
-        lvgl_clear_status();
-        lv_label_set_text(s_lbl_a, "WiFi failed!");
+        lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0xFF, 0x55, 0x55), 0); // 紅色
+        lv_label_set_text(s_lbl_status, "WiFi 連線失敗");
+        lv_label_set_text(s_lbl_model, "請檢查網路設定");
+        lvgl_unlock();
+    }
+    xSemaphoreGive(s_mutex);
+}
+
+// 💥 [錯誤狀態 2] Telegram 斷線
+void display_service_show_telegram_fail(void) {
+    xSemaphoreTake(s_mutex, portMAX_DELAY);
+    if (lvgl_lock(0)) {
+        lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0xFF, 0x55, 0x55), 0); // 紅色
+        lv_label_set_text(s_lbl_status, "Telegram 連線失敗");
+        lv_label_set_text(s_lbl_model, "請檢查 Bot Token");
+        lvgl_unlock();
+    }
+    xSemaphoreGive(s_mutex);
+}
+
+// 💥 [錯誤狀態 3] 通用錯誤
+void display_service_show_error(const char *error_msg) {
+    xSemaphoreTake(s_mutex, portMAX_DELAY);
+    if (lvgl_lock(0)) {
+        lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0xFF, 0x55, 0x55), 0); // 紅色
+        if (error_msg) {
+            lv_label_set_text_fmt(s_lbl_status, "%s 連線失敗", error_msg);
+        } else {
+            lv_label_set_text(s_lbl_status, "系統連線失敗");
+        }
+        lv_label_set_text(s_lbl_model, "等待重試...");
         lvgl_unlock();
     }
     xSemaphoreGive(s_mutex);
 }
 
 void display_service_show_ready(const char *ip, const char *provider, const char *model) {
-    if (ip) strncpy(s_ip, ip, sizeof(s_ip) - 1);
     xSemaphoreTake(s_mutex, portMAX_DELAY);
     if (lvgl_lock(0)) {
-        lvgl_clear_status();
-        lv_label_set_text(s_lbl_a, provider ? provider : "");
-        lv_label_set_text(s_lbl_b, model ? model : "");
-        lv_label_set_text(s_lbl_ip, s_ip);
+        // 就緒狀態：綠色
+        lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0x55, 0xFF, 0x55), 0); 
+        lv_label_set_text(s_lbl_status, "MiniClaw Online");
+        
+        // 顯示模型名稱 (青色)
+        if (model) {
+            lv_label_set_text_fmt(s_lbl_model, "Model: %s", model);
+        } else {
+            lv_label_set_text(s_lbl_model, "Model: Ready");
+        }
         lvgl_unlock();
     }
     xSemaphoreGive(s_mutex);
 }
 
+// 保留空函數介面以兼容標頭檔
 void display_service_show_thinking(const char *channel) {}
 void display_service_show_message(const char *channel, const char *preview) {}
 
@@ -240,8 +249,8 @@ void display_service_push_chat(const char *role, const char *content) {
     if (!role || !content || content[0] == '\0') return;
 
     bool is_user      = (strcmp(role, "user")      == 0);
-    bool is_assistant = (strcmp(role, "assistant")  == 0);
-    bool is_system    = (strcmp(role, "system")     == 0);
+    bool is_assistant = (strcmp(role, "assistant") == 0);
+    bool is_system    = (strcmp(role, "system")    == 0);
 
     if (!is_user && !is_assistant && !is_system) return;
     if (!lvgl_lock(200)) return;
@@ -258,17 +267,26 @@ void display_service_push_chat(const char *role, const char *content) {
     lv_obj_set_style_bg_opa(row, LV_OPA_TRANSP, 0);
     lv_obj_set_style_border_width(row, 0, 0);
     lv_obj_set_style_pad_all(row, 0, 0);
+    
+    // 🛑 修復重點：強制關閉 row 的捲軸與滾動標記
+    lv_obj_clear_flag(row, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollbar_mode(row, LV_SCROLLBAR_MODE_OFF);
 
     lv_obj_t *bubble = lv_obj_create(row);
     lv_obj_set_style_border_width(bubble, 0, 0);
     lv_obj_set_style_radius(bubble, 8, 0);
     lv_obj_set_style_pad_all(bubble, BUBBLE_PAD, 0);
     lv_obj_set_height(bubble, LV_SIZE_CONTENT);
+    
+    // 🛑 修復重點：強制關閉 bubble 氣泡的捲軸與滾動標記，徹底消滅底部白線！
+    lv_obj_clear_flag(bubble, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_scrollbar_mode(bubble, LV_SCROLLBAR_MODE_OFF);
 
     lv_obj_t *lbl = lv_label_create(bubble);
     lv_obj_set_style_text_font(lbl, s_font_cn, 0);
     lv_label_set_long_mode(lbl, LV_LABEL_LONG_WRAP);
     lv_label_set_text(lbl, content);
+    lv_obj_set_height(lbl, LV_SIZE_CONTENT); // 確保 Label 高度也自動適應，避免溢出
 
     lv_obj_set_width(lbl, LV_SIZE_CONTENT);
     lv_obj_update_layout(lbl);
