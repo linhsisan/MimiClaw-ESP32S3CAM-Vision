@@ -8,7 +8,6 @@ releases/
 sdkconfig
 sdkconfig.old
 dependencies.lock
-components/
 managed_components/
 
 # Generated headers
