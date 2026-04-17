@@ -1,7 +1,21 @@
 <<<<<<< HEAD
 MimiClaw 是一個基於 ESP32-S3 的個人實體 AI 助手。它不僅具備大語言模型（LLM）的靈魂，還擁有攝影機、感測器與馬達組成的物理身體。透過 Telegram，你可以隨時隨地指揮它觀察環境、操作硬體。
+
+V1.1.3 版本修改內容清單 (Release Notes)
+[V1.1.3] - 2026-04-17
+核心目標：恢復硬體穩定性與強化 AI 執行紀律
+⚡ 底層回歸 (Core Restoration):
+撤銷對 agent_loop, cron_service, llm_proxy, http_proxy 的實驗性修改。
+完全恢復原創作者的穩定 C 語言底層，確保 ESP32 與網路代理、排程引擎的通訊不中斷。
+🧠 記憶體優化 (Memory Optimization):
+路徑修正： 將 MEMORY.md 位置鎖定在 /spiffs/memory/MEMORY.md。
+鏡像執行法則 (Tool Call Enforcement): 修正了 AI 只給文字回覆而不呼叫工具的 Bug。
+伺服馬達防呆： 導入「預設速度 100」機制與「禁用 JSON」規範，解決馬達不轉的問題。
+禁評法則 (No-Judgment Policy): 強制 AI 停止判定時間是否過期，改由底層 C 語言系統處理。
+🛠️ 硬體定義確認:
+重新鎖定 GPIO 40 (Servo), 48 (LED), 2 (DHT11), 1 (ADC) 的操作權限。
 =======
-# MimiClaw: $5 芯片上的口袋 AI 助理 這個版本增加有攝影功能的。你只要說我要拍照就可以。
+# MimiClaw: AI 助理 這個版本增加有攝影功能的。你只要說我要拍照就可以。
 這是一份針對 **MimiClaw** 從零開始的完整安裝與操作手冊。我特別針對你提到的「設備切換」與「計時器邏輯」進行了優化，這能確保 LLM 在處理多任務時不會「斷片」。
 >>>>>>> 6b61dba5ba0b305cd41dcc0c6e2ae195a05b6392
 
