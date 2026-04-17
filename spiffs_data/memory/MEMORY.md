@@ -36,4 +36,5 @@
 * **Action**: Automatically sends photo via Telegram. (No parameters).
 
 ---
+用戶請求：在成功排程任務後，我將顯示“cron.json已經成功寫入排程”消息。如果排程有問題，我將列出具體問題。
 
