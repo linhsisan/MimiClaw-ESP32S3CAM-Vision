@@ -17,11 +17,9 @@
 
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
-#include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-static const char *TAG = "ili9341";
 static spi_device_handle_t s_spi;
 
 static void write_cmd(uint8_t cmd) {
