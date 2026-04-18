@@ -12,19 +12,35 @@
 
 出於資訊安全與隱私，原作者的雲端程式碼**絕對不會**包含私人的 WiFi 密碼或 API 金鑰。當你下載別人的專案時，一定會缺少這個核心設定檔，導致編譯失敗（出現 `No such file` 錯誤）。
 
-* 請進入解壓縮後的 `main/` 資料夾，點擊右鍵新增一個文字檔。
+* 請進入解壓縮後的進入目錄 main/mimi_secrets.h.sample  把這個檔案複製新增一個文字檔。
 * 命名為 **`mimi_secrets.h`** (請注意：必須開啟 Windows 的「顯示副檔名」功能，確保它不是變成 `mimi_secrets.h.txt`)。
 * 將以下程式碼貼入並填寫你的私人資料後存檔：
   ```c
+  #pragma once
   #ifndef MIMI_SECRETS_H
   #define MIMI_SECRETS_H
 
   #define WIFI_SSID           "你家的WiFi名稱"       // 僅支援 2.4GHz
   #define WIFI_PASS           "你家的WiFi密碼"
-  #define OPENAI_API_KEY      "sk-你的OpenAI金鑰"
+
   #define TELEGRAM_BOT_TOKEN  "你的Telegram機器人Token"
 
-  #endif
+  //--- 切換到 OpenAI GPT-5-mini --- 
+  #define MIMI_SECRET_MODEL_PROVIDER "openai"
+  #define OPENAI_API_KEY      "sk-你的OpenAI金鑰"
+  #define MIMI_SECRET_MODEL          "gpt-4o-mini"
+
+  /* HTTP Proxy (leave empty or set both) */
+  #define MIMI_SECRET_PROXY_HOST      ""
+  #define MIMI_SECRET_PROXY_PORT      ""
+  #define MIMI_SECRET_PROXY_TYPE      ""   /* "http" or "socks5" */
+
+  /* Brave Search API */
+  #define MIMI_SECRET_SEARCH_KEY      ""
+  /* Tavily Search API  */
+  #define MIMI_SECRET_TAVILY_KEY      ""
+   #endif
+   
   ```
 
 ---
