@@ -1,147 +1,104 @@
-# 🎥 MimiClaw v1.1.6 終極手冊：從零到一完整部署 (ZIP 離線整合版)
+廠長來了！阿三老闆，您說得對，這份舊的手冊混合了命令列（CMD）和 VS Code 的操作，對於不熟悉指令的初學者來說，絕對會看得一頭霧水。
 
-## ⚠️ 零階段：絕對避坑守則 (開工前必看)
-1. **路徑守則**：你的所有安裝路徑、專案資料夾，**絕對不可以有中文、全形字元或空格**。（❌ `C:\我的專案`、❌ `C:\mimi space` -> ✅ `C:\mimi_work`）。
-2. **防毒軟體**：編譯過程中會產生大量零碎檔案，請暫時關閉防毒軟體或將專案資料夾加入白名單，否則編譯極度緩慢甚至報錯。
-3. **傳輸線確認**：確保你的 Type-C 線是「資料傳輸線」，而不是只能充電的劣質線。
+既然您希望大家都能用最直觀的 **VS Code 介面** 來完成安裝和燒錄，而且不要講太深奧的底層程式碼（JSON payload 那些我們一律藏起來！），我們就把整份手冊大翻修，變成「純 VS Code 傻瓜圖文版」！
 
----
-
-## 第一階段：ESP-IDF 離線環境大建 (電腦不留痕跡)
-**目標：使用官方整合包，不需手動安裝 Git 或 Python，一鍵搞定底層。**
-
-1. **下載離線包**：
-   * 前往 Espressif 官方下載頁面 (搜尋 `ESP-IDF Offline Installer`)。
-   * 下載 **`ESP-IDF v5.1.4 Offline Installer`**（檔案約 1GB 左右）。
-2. **執行安裝**：
-   * 點擊執行，安裝路徑請保持簡短（強烈建議裝在 `C:\Espressif`）。
-   * 一路按「下一步」直到安裝完成。這包軟體已經內建了專屬的編譯器，不會弄亂你電腦原有的環境。
-3. **安裝 VS Code 與核心外掛**：
-   * 下載並安裝 VS Code。
-   * 在 VS Code 左側的「延伸模組 (Extensions)」搜尋並安裝 **`Espressif IDF`**。
+這份重新編排的《MimiClaw V1.1.6 初學者終極手冊》，保證連新手都能一路順暢點擊到成功：
 
 ---
 
-## 第二階段：精準下載代碼與 VS Code 環境對接
-**目標：拿到正確的 v1.1.6 代碼，並讓 VS Code 認得你的離線編譯器。**
+# 🦞 MimiClaw V1.1.6 終極手冊：VS Code 純圖形化一鍵安裝版
 
-1. **下載 v1.1.6 ZIP 檔**：
-   * 開啟你的 MimiClaw GitHub 網頁。
-   * 點擊左上角的 `Branch: main` 按鈕，切換到 **`Tags`** 分頁。
-   * 點擊 **`v1.1.6`**。
-   * 點擊綠色的 **`Code`** 鈕 -> **`Download ZIP`**。
-2. **解壓縮專案**：
-   * 將下載的壓縮檔解壓至 `C:\mimi_work\mimiclaw-1.1.6`。
-   * 在 VS Code 點擊 `File` -> `Open Folder`，打開這個資料夾。
-3. **VS Code 環境對接 (極度重要)**：
-   * 按下鍵盤 `F1`，輸入 `ESP-IDF: Configure ESP-IDF Extension`。
-   * 🚨 **關鍵選擇**：這次請選擇 **`Use existing setup` (使用現有設定)**。
-   * VS Code 會自動偵測到你剛才安裝在 `C:\Espressif` 的工具，下方會亮起綠色勾勾顯示配置完成。
+這是一份專為初學者設計的教學，全程只需使用滑鼠點擊和 VS Code，不需要打任何複雜的指令！
+
+## ⚠️ 零階段：開工前必看「防雷守則」
+1. **路徑不能有中文**：您的安裝路徑、專案資料夾，**絕對不可以**有中文、全形字元或空格。（❌ `C:\我的專案` -> ✅ `C:\mimi_work`）。
+2. **防毒軟體請冷靜**：編譯會產生大量小檔案，請暫時關閉防毒軟體，否則速度會超級慢甚至失敗。
+3. **線材確認**：請確保您的 Type-C 線是「資料傳輸線」，而不是買手機送的只能充電的劣質線。
+4. **硬體供電**：如果您接了螢幕或擴充板，請確認它是接 **5V** 電源，不要接成 3.3V。
 
 ---
 
-## 第三階段：硬體連線與狀態列對齊 (通訊協議)
-**目標：讓電腦與開發板正確溝通。**
+## 🛠️ 第一階段：下載並安裝 ESP-IDF (離線整合包)
+*目標：安裝核心工具，不需要手動裝 Git 或 Python。*
 
-1. **硬體接線**：
-   * ESP32-S3 板子通常有兩個 Type-C 孔。請務必插在印有 **`UART`** 或 **`COM`** 的孔（另一個是 USB/OTG，絕對不要插錯）。
-2. **確認 COM 埠**：
-   * 打開 Windows「裝置管理員」 -> 「連接埠 (COM 和 LPT)」。記下晶片所在的編號（例如 `COM3`）。
-3. **VS Code 狀態列對齊 (請看畫面最下方藍色橫條)**：
-   * **Select Port (插頭圖示)**：點擊後選擇你的 `COM3`。
-   * **Select Target (晶片圖示)**：點擊後選擇 **`esp32s3`**。接著跳出選單請選 `ESP-IDF: esp32s3`。
-   * **Flash Method (閃電旁邊的設定)**：點擊並選擇 **`UART`**。（🚨 絕不能選 JTAG）。
+1. **下載離線包**：前往 Espressif 官方下載頁面，下載 **ESP-IDF v5.1.4 Offline Installer**（檔案約 1GB）。
+2. **執行安裝**：一路按「下一步」。**強烈建議**安裝路徑設為極簡的 `C:\Espressif`。
+3. **準備 VS Code**：打開 VS Code，在左側「延伸模組 (Extensions)」搜尋並安裝 **Espressif IDF**。
 
 ---
 
-## 第四階段：Menuconfig 全參數絕對對齊 (最核心關鍵)
-**目標：開啟大腦所需的記憶體與分區空間，錯一步開機必死當。**
+## 📂 第二階段：下載專案與 VS Code 綁定
+*目標：把 MimiClaw 專案放進來，並讓 VS Code 認識編譯器。*
 
-點擊 VS Code 下方狀態列的 **「齒輪圖示 ⚙️ (SDK Configuration Editor)」**。請逐一搜尋並修改下列參數：
-
-### 1. 分割區表對齊 (讓系統能燒錄靈魂檔)
-* 搜尋 `Partition Table`
-* 將 `Partition Table` 設定改為 -> **`Custom partition table CSV`**
-* `Custom partition CSV file` -> 輸入 **`partitions.csv`**
-
-### 2. 外部記憶體 PSRAM 對齊 (Mimi 運算必備，沒開必當機)
-* 搜尋 `Support for external, SPI-connected RAM` -> **勾選 (啟用)**
-* 搜尋 `SPI RAM config`
-* `Mode (SRAM Type)` -> 選擇 **`Octal Mode PSRAM`**。
-* `PSRAM Clock Speed` -> 選擇 **`80MHz`**。
-
-### 3. Flash 閃存對齊 (防止程式裝不下)
-* 搜尋 `Serial flasher config`
-* `Flash SPI speed` -> 選擇 **`80MHz`**。
-* `Flash size` -> 🚨 **選擇 `16MB`**。
-
-### 4. 網路與基本設定
-* 搜尋 `WiFi SSID` -> 填入你的網路名稱。
-* 搜尋 `WiFi Password` -> 填入你的網路密碼。
-
-設定完成後，點擊畫面上方的 **`Save`**。
+1. **下載 V1.1.6 專案**：
+   * 到 MimiClaw 的 GitHub 網頁。
+   * 點擊左上角的 `Branch: main` -> 切換到 `Tags` -> 選擇 **`v1.1.6`**。
+   * 點擊綠色的 `Code` 按鈕 -> 選擇 **Download ZIP**。
+2. **解壓縮**：將 ZIP 檔解壓縮到一個沒有中文的資料夾，例如 `C:\mimi_work\mimiclaw`。
+3. **在 VS Code 打開專案**：在 VS Code 點擊 `File` -> `Open Folder`，選擇剛剛解壓縮的資料夾。
+4. **環境綁定 (關鍵點)**：
+   * 按下鍵盤 `F1`，輸入並選擇 `ESP-IDF: Configure ESP-IDF Extension`。
+   * 🚨 **重要**：在設定畫面中選擇 **Use existing setup** (使用現有設定)。VS Code 會自動找到您安裝在 `C:\Espressif` 的工具，等它顯示配置完成即可。
 
 ---
 
-## 第五階段：雙重燒錄與靈魂注入 (Build & Flash)
+## 🔌 第三階段：硬體連線與 VS Code 狀態列對齊
+*目標：讓電腦知道您的晶片接在哪個孔。*
 
-
----
-
-### 第一步：喚醒環境 (日常起手式)
-請先確認你的黑畫面 (CMD) 已經處於喚醒狀態。
-1. 進入專案：`cd C:\你的專案路徑\MimiClaw`
-2. 執行喚醒：`C:\espidf\v5.3.5\esp-idf\export.bat`
-*(看到 `Done!` 即可繼續)*
-
-### 第二步：執行「全面洗腦」指令 (最關鍵)
-接上開發板，確認你的 COM 埠（假設是 COM3）。我們要把晶片裡的所有分區（包含那個卡住的舊密碼）全部炸毀、恢復原廠空白狀態。
-
-在終端機輸入：
-```cmd
-idf.py -p COM3 erase-flash
-```
-*(這大概會花 10 到 15 秒。當你看到 `Erasing flash... Done` 的字樣，代表晶片已經完全失憶了。)*
-
-### 第三步：清除電腦端的舊快取 (防呆)
-有時候電腦裡的編譯器也會卡住舊的設定。我們把它徹底清空：
-```cmd
-idf.py fullclean
-```
-
-### 第四步：最後一次參數檢查 (防手滑陷阱)
-重新打開設定選單：
-```cmd
-idf.py menuconfig
-```
-**🚨 這裡有兩個超級常犯的致命錯誤，請務必檢查：**
-1. **WiFi 密碼的空白鍵**：確認你在填寫 SSID 和 Password 時，**結尾絕對沒有不小心多打一個空白鍵 (Space)**。ESP32 會把空白鍵當作密碼的一部分！
-2. **API Key 的位置**：確認 API Key 真的是在 `menuconfig` 裡面填寫嗎？很多開源專案的 API Key 其實是要你打開原始碼裡面的 `main/mimi_config.h` 或 `secrets.h` 手動貼上的。請確認你填對了地方。
-*(檢查完畢後，按 `S` 存檔，`Q` 離開。)*
-
-### 第五步：終極大一統燒錄
-既然晶片已經被洗腦，快取也清除了，我們現在用一行指令把所有東西（程式、定時規則、監視器）一次性全部寫進去：
-
-```cmd
-idf.py -p COM3 build flash storage-flash monitor
-```
-
-**這個流程的運作邏輯是：**
-1. `build`：用你剛剛確認過的新密碼重新編譯。
-2. `flash`：把全新的程式寫入剛被洗腦的乾淨晶片中。
-3. `storage-flash`：把靈魂檔（定時規則）重新寫進去。
-4. `monitor`：立刻打開日誌監視器。
-
-盯著你的黑畫面日誌，這次因為 NVS 是乾淨的，程式會強制讀取你剛編譯進去的新密碼。你一定能看到 `WIFI: Connected` 以及 API 連線成功的訊息了！
+1. **接線**：將 ESP32-S3 接上電腦。板子上有兩個 Type-C 孔，請務必插在印有 **UART 或 COM** 的那個孔。
+2. **尋找狀態列**：請看 VS Code 畫面的 **最下方藍色（或紫色）橫條**。
+3. **依序點擊設定**：
+   * **插頭圖示 (Select Port)**：點擊後，在上方跳出的清單選擇您的 COM 埠（例如 COM3）。
+   * **晶片圖示 (Select Target)**：點擊後，選擇 `esp32s3`。接著如果跳出子選單，請選 `ESP-IDF: esp32s3`。
+   * **閃電旁邊的齒輪 (Flash Method)**：點擊並選擇 **UART**。（🚨 絕對不能選 JTAG）。
 
 ---
 
-## 第六階段：終極驗證 (Monitor)
-點擊狀態列的 **小螢幕圖示 📺 (Monitor)** 打開日誌。
+## ⚙️ 第四階段：核心參數設定 (Menuconfig)
+*目標：開啟晶片記憶體，填寫您的 Wi-Fi 與 MQTT 資訊。*
 
-**你必須看到這三行才算完美成功**：
-1. `I (...) esp_psram: Adding ... bytes of PSRAM to heap` (證明 PSRAM 參數設定正確)
-2. `I (...) mimi_main: SPIFFS mounted successfully` (證明分區與 storage-flash 成功)
-3. `I (...) mimi_main: MimiClaw V1.1.6 Fully Operational!` (證明你下載的是正確的 v1.1.6 版本)
+1. 點擊 VS Code 下方狀態列的 **「齒輪圖示 ⚙️ (SDK Configuration Editor)」**，這會打開圖形化設定介面。
+2. 在上方的搜尋框中，**逐一搜尋並修改**以下設定：
 
-現在，這份手冊包含了從「免 Git 環境搭建」到「最後一個硬體參數對齊」的所有細節。你可以完全依靠這份內容完成實機部署！
+   * **[分區表設定]**
+     * 搜尋 `Partition Table` -> 將設定改為 **Custom partition table CSV**
+     * 搜尋 `Custom partition CSV file` -> 輸入 **`partitions.csv`**
+   * **[記憶體設定 - 沒開必當機]**
+     * 搜尋 `Support for external, SPI-connected RAM` -> **打勾 (啟用)**
+     * 搜尋 `SPI RAM config` -> Mode 選擇 **Octal Mode PSRAM**，Speed 選擇 **80MHz**。
+   * **[容量設定]**
+     * 搜尋 `Flash SPI speed` -> 選擇 **80MHz**。
+     * 搜尋 `Flash size` -> 🚨 選擇 **16MB**。
+   * **[網路與通訊設定]**
+     * 搜尋 `WiFi SSID` -> 填寫網路名稱。
+     * 搜尋 `WiFi Password` -> 填寫密碼 (🚨注意：結尾千萬不能有空格！)。
+     * 搜尋 `Device ID` -> 填寫您專屬的設備代號 (這非常重要，通訊必備！)。
+     * 搜尋 `MQTT Topic` -> 填寫對應的通訊主題。
+3. 🚨 設定全部填完後，請務必點擊畫面右上方的 **「Save」** 存檔！
+
+---
+
+## 🚀 第五階段：一鍵燒錄 (Build, Flash & Monitor)
+*目標：清除舊資料，將新程式與靈魂檔一次燒進去。*
+
+1. **徹底洗腦 (重要防呆)**：
+   * 點擊下方狀態列的 **「垃圾桶圖示 🗑️ (ESP-IDF Full Clean)」**，清除所有舊快取。
+   * 點擊下方狀態列的 **「橡皮擦圖示 🧼 (Erase Flash)」**，這會把晶片完全清空（約需 10 秒）。
+2. **一鍵燒錄**：
+   * 點擊下方狀態列的 **「火焰圖示 🔥 (Build, Flash and Monitor)」**。
+   * 接下來請泡杯咖啡，系統會自動開始編譯並寫入程式，第一次大約需要 3-5 分鐘。
+3. **寫入靈魂檔 (Storage Flash)**：
+   * 為了讓定時規則等檔案生效，按下 `F1`，輸入並選擇 **`ESP-IDF: Flash SPIFFS`**。
+
+---
+
+## ✅ 第六階段：終極驗證
+當一切燒錄完成，VS Code 下方會自動跳出一個黑色的監控視窗 (Monitor)。
+如果您看到以下關鍵字樣，代表您已經大功告成！
+
+* `I (...) esp_psram: Adding ... bytes of PSRAM to heap` (記憶體掛載成功)
+* `WIFI: Connected` (網路連線成功)
+* `I (...) mimi_main: SPIFFS mounted successfully` (靈魂檔讀取成功)
+* `I (...) mimi_main: MimiClaw V1.1.6 Fully Operational!` (系統完美啟動)
+
+恭喜您，您的 MimiClaw 已經成功上線服役！
