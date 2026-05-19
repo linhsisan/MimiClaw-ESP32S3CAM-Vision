@@ -10,6 +10,10 @@ static const char *TAG = "ota";
 
 esp_err_t ota_update_from_url(const char *url)
 {
+    if (url == NULL || strncmp(url, "https://", 8) != 0) {
+        ESP_LOGE(TAG, "OTA rejected: URL must use HTTPS scheme");
+        return ESP_ERR_INVALID_ARG;
+    }
     ESP_LOGI(TAG, "Starting OTA from: %s", url);
 
     esp_http_client_config_t config = {
