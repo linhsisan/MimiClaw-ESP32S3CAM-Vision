@@ -149,7 +149,7 @@ void app_main(void) {
         // 9. 背景定時照片 (選填)
         // xTaskCreate(camera_capture_task, "camera_task", 8192, NULL, 5, NULL);
 
-        display_service_show_ready("Online", "Telegram", MIMI_LLM_DEFAULT_MODEL);
+        display_service_show_ready("Online", "Telegram", MIMI_LLM_DEFAULT_MODEL); //TFT 顯示模型名稱
         ESP_LOGI(TAG, "MimiClaw 系統完全啟動！");
         
         // --- 🕵️ 靈魂檔案自檢已移除 ---
