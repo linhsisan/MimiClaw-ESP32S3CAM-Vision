@@ -9,6 +9,10 @@
 #include "esp_event.h"
 #include "esp_spiffs.h"
 
+#include "nvs.h" // 新增這行來操作 nvs_open, nvs_get_str
+#include "mimi_secrets.h" // 確保能讀到巨集設定 (如果有)
+
+
 // 基礎組件
 #include "wifi/wifi_manager.h"
 #include "display_service.h"
@@ -16,6 +20,9 @@
 #include "agent/agent_loop.h" 
 #include "channels/telegram/telegram_bot.h"
 #include "cron/cron_service.h"  
+
+
+
 
 // 大腦與工具
 #include "llm/llm_proxy.h"
@@ -142,7 +149,7 @@ void app_main(void) {
         // 9. 背景定時照片 (選填)
         // xTaskCreate(camera_capture_task, "camera_task", 8192, NULL, 5, NULL);
 
-        display_service_show_ready("Online", "Telegram", "GPT-4o-Mini");
+        display_service_show_ready("Online", "Telegram", MIMI_LLM_DEFAULT_MODEL);
         ESP_LOGI(TAG, "MimiClaw 系統完全啟動！");
         
         // --- 🕵️ 靈魂檔案自檢已移除 ---
