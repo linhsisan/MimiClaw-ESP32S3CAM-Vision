@@ -93,23 +93,23 @@
 #define MIMI_OPENAI_API_URL          "https://api.minimaxi.com/v1/chat/completions"
 */
 
-
+/*
 // deepseek-v4-flash 
 #define MIMI_LLM_DEFAULT_MODEL       "deepseek-v4-flash" //"deepseek-chat"  //"deepseek-v4-flash"
 #define MIMI_LLM_PROVIDER_DEFAULT    "openai"
 #define MIMI_LLM_MAX_TOKENS          4096
 #define MIMI_LLM_API_URL             "https://api.deepseek.com/v1/chat/completions"
 #define MIMI_OPENAI_API_URL          "https://api.deepseek.com/v1/chat/completions" // 👈 補上這行
+*/
 
 
-/*
  //openai 的 gpt-4o-mini 模型，對應約 4096 tokens 上限
 #define MIMI_LLM_DEFAULT_MODEL       "gpt-4o-mini"
 #define MIMI_LLM_PROVIDER_DEFAULT    "openai"
 #define MIMI_LLM_MAX_TOKENS          4096
 #define MIMI_LLM_API_URL             "https://api.openai.com/v1/chat/completions"
 #define MIMI_OPENAI_API_URL          "https://api.openai.com/v1/chat/completions"
-*/
+
 
 
 #define MIMI_LLM_API_VERSION         "2023-06-01"
