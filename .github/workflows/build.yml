@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+
+jobs:
+  idf-build:
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:release-v5.3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # 這裡不加 submodules 參數，避免剛才的 arduino 幽靈資料夾問題
+
+      - name: Build firmware (ESP32-S3)
+        shell: bash
+        run: |
+          # 👇 確保在 Docker 環境內的所有 Git 指令都不會報錯 (Exit Code 128)
+          git config --global --add safe.directory '*'
+          
+          # 👇 原本的編譯步驟
+          . "$IDF_PATH/export.sh"
+          idf.py set-target esp32s3
+          idf.py fullclean
+          idf.py build
