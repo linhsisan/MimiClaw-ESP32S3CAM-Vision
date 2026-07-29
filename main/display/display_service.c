@@ -203,7 +203,7 @@ void display_service_show_wifi_connecting(const char *ssid) {
     xSemaphoreTake(s_mutex, portMAX_DELAY);
     if (lvgl_lock(0)) {
         lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0xE8, 0xE8, 0xE8), 0); 
-        lv_label_set_text(s_lbl_status, "MiniClaw 連線中...");
+        lv_label_set_text(s_lbl_status, "MiMiClaw 連線中...");
         lv_label_set_text_fmt(s_lbl_model, "AP: %s", ssid ? ssid : "?");
         lvgl_unlock();
     }
@@ -214,7 +214,7 @@ void display_service_show_wifi_ok(const char *ip) {
     xSemaphoreTake(s_mutex, portMAX_DELAY);
     if (lvgl_lock(0)) {
         lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0x55, 0xFF, 0x55), 0); 
-        lv_label_set_text(s_lbl_status, "MiniClaw Online");
+        lv_label_set_text(s_lbl_status, "MiMiClaw Online");
         lv_label_set_text(s_lbl_model, "正在載入模型...");
         lvgl_unlock();
     }
@@ -262,7 +262,7 @@ void display_service_show_ready(const char *ip, const char *provider, const char
     xSemaphoreTake(s_mutex, portMAX_DELAY);
     if (lvgl_lock(0)) {
         lv_obj_set_style_text_color(s_lbl_status, lv_color_make(0x55, 0xFF, 0x55), 0); 
-        lv_label_set_text(s_lbl_status, "MiniClaw Online");
+        lv_label_set_text(s_lbl_status, "MiMiClaw Online");
         
         if (model) {
             lv_label_set_text_fmt(s_lbl_model, "Model: %s", model);
